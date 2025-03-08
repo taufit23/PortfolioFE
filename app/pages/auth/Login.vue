@@ -2,12 +2,65 @@
     definePageMeta({
         layout: false,
         middleware: 'guest'
-    })
+    });
 
-    const email = ref('')
-    const password = ref('')
+    const email = ref('');
+    const password = ref('');
     const checked = ref(false);
+    const config = useRuntimeConfig();
+
+    const baseURL = config.public.API_BASE_URL;
+    const token = useCookie('token', {
+        maxAge: 60 * 60 * 24 * 7
+    }); // Token bertahan 7 hari
+    const user = useCookie('user', {
+        maxAge: 60 * 60 * 24 * 7
+    }); // User data bertahan 7 hari
+    const permissions = useCookie('permissions', {
+        maxAge: 60 * 60 * 24 * 7
+    }); // Simpan permission user
+
+    const login = async () => {
+        try {
+            const response = await $fetch(`${baseURL}auth/login`, {
+                method: 'POST',
+                body: {
+                    email: email.value,
+                    password: password.value
+                }
+            });
+
+            // Simpan token
+            token.value = response.access_token;
+
+            // Simpan data user
+            user.value = {
+                name: response.user.name,
+                username: response.user.username,
+                email: response.user.email,
+                roles: response.user.roles.map(role => ({
+                    id: role.id,
+                    name: role.role_name
+                }))
+            };
+
+            // Simpan permission sebagai object dari masing-masing permission
+            permissions.value = response.user.roles.flatMap(role =>
+                role.permision.map(perm => ({
+                    id: perm.id,
+                    name: perm.permision_name,
+                    slug: perm.permision_slug,
+                    is_menu: perm.is_menu
+                }))
+            );
+
+            navigateTo('/authenticated/dashboard'); // Arahkan ke dashboard setelah login
+        } catch (error) {
+            console.error('Login gagal', error);
+        }
+    };
 </script>
+
 
 <template>
     <div
@@ -41,25 +94,29 @@
                     </div>
 
                     <div>
-                        <label for="email1"
-                            class="block text-surface-900 dark:text-surface-0 text-xl font-medium mb-2">Email</label>
-                        <InputText id="email1" v-model="email" type="text" placeholder="Email address"
-                            class="w-full md:w-[30rem] mb-8" />
+                        <form @submit.prevent="login">
 
-                        <label for="password1"
-                            class="block text-surface-900 dark:text-surface-0 font-medium text-xl mb-2">Password</label>
-                        <Password id="password1" v-model="password" placeholder="Password" :toggle-mask="true"
-                            class="mb-4" fluid :feedback="false" />
+                            <label for="email1"
+                                class="block text-surface-900 dark:text-surface-0 text-xl font-medium mb-2">Email</label>
+                            <InputText id="email1" v-model="email" type="text" placeholder="Email address"
+                                class="w-full md:w-[30rem] mb-8" />
 
-                        <div class="flex items-center justify-between mt-2 mb-8 gap-8">
-                            <div class="flex items-center">
-                                <Checkbox id="rememberme1" v-model="checked" binary class="mr-2" />
-                                <label for="rememberme1">Remember me</label>
+                            <label for="password1"
+                                class="block text-surface-900 dark:text-surface-0 font-medium text-xl mb-2">Password</label>
+                            <Password id="password1" v-model="password" placeholder="Password" :toggle-mask="true"
+                                class="mb-4" fluid :feedback="false" />
+
+                            <div class="flex items-center justify-between mt-2 mb-8 gap-8">
+                                <div class="flex items-center">
+                                    <Checkbox id="rememberme1" v-model="checked" binary class="mr-2" />
+                                    <label for="rememberme1">Remember me</label>
+                                </div>
+                                <span
+                                    class="font-medium no-underline ml-2 text-right cursor-pointer text-primary">Forgot
+                                    password?</span>
                             </div>
-                            <span class="font-medium no-underline ml-2 text-right cursor-pointer text-primary">Forgot
-                                password?</span>
-                        </div>
-                        <Button label="Sign In" class="w-full" as="router-link" to="/" />
+                            <Button label="Sign In" class="w-full" type="submit" />
+                        </form>
                     </div>
                 </div>
             </div>

@@ -3,6 +3,11 @@ import esLocale from './app/theme/locale/es.json'
 
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
+  runtimeConfig: {
+    public: {
+      API_BASE_URL: 'http://localhost:8000/api/'
+    }
+  },
   modules: [
     '@primevue/nuxt-module',
     '@nuxt/eslint',
@@ -29,6 +34,7 @@ export default defineNuxtConfig({
     // https://nuxt.com/docs/getting-started/upgrade#testing-nuxt-4
     compatibilityVersion: 4,
   },
+
 
   experimental: {
     // https://nuxt.com/blog/v3-5#fully-typed-pages

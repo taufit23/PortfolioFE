@@ -6,6 +6,10 @@
             fatal: true,
         });
     };
+    definePageMeta({
+        layout: 'authenticated',
+        middleware: 'auth'
+    });
 </script>
 
 <template>

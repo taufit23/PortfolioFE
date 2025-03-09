@@ -63,6 +63,7 @@
 </script>
 
 <template>
+    <Toast :base-z-index="999" />
     <div class="layout-wrapper" :class="containerClass">
         <div class="layout-sidebar">
             <AppSidebar />

@@ -11,14 +11,50 @@
                 }],
             },
             {
-                label: 'App Setup',
+                label: 'App',
                 items: [{
-                    label: 'User Management',
-                    icon: 'pi pi-fw pi-home',
-                    to: '/authenticated/user-management/'
-                }],
-            }
-        ]);
+                        label: 'App Management',
+                        icon: 'pi pi-fw pi-home',
+                        items: [{
+                            label: 'User Management',
+                            icon: 'pi pi-fw pi-user',
+                            to: '/authenticated/user-management/'
+                        }, {
+                            label: 'Roles',
+                            icon: 'pi pi-fw pi-key',
+                            to: '/'
+                        }]
+                    },
+                    {
+                        label: 'Submenu 2',
+                        icon: 'pi pi-fw pi-bookmark',
+                        items: [{
+                                label: 'Submenu 2.1',
+                                icon: 'pi pi-fw pi-bookmark',
+                                items: [{
+                                        label: 'Submenu 2.1.1',
+                                        icon: 'pi pi-fw pi-bookmark'
+                                    },
+                                    {
+                                        label: 'Submenu 2.1.2',
+                                        icon: 'pi pi-fw pi-bookmark'
+                                    }
+                                ]
+                            },
+                            {
+                                label: 'Submenu 2.2',
+                                icon: 'pi pi-fw pi-bookmark',
+                                items: [{
+                                    label: 'Submenu 2.2.1',
+                                    icon: 'pi pi-fw pi-bookmark'
+                                }]
+                            }
+                        ]
+                    }
+                ]
+            },
+        ]
+    );
 </script>
 
 <template>

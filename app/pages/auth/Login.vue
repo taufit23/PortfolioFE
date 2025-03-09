@@ -11,13 +11,13 @@
 
     const baseURL = config.public.API_BASE_URL;
     const token = useCookie('token', {
-        maxAge: 60 * 60 * 24 * 7
+        maxAge: 60 * 60
     }); // Token bertahan 7 hari
     const user = useCookie('user', {
-        maxAge: 60 * 60 * 24 * 7
+        maxAge: 60 * 60
     }); // User data bertahan 7 hari
     const permissions = useCookie('permissions', {
-        maxAge: 60 * 60 * 24 * 7
+        maxAge: 60 * 60
     }); // Simpan permission user
 
     const login = async () => {

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+    // app/utils/error.vue
     import type {
         NuxtError
     } from '#app'

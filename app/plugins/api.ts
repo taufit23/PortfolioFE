@@ -1,3 +1,4 @@
+// app/plugins/api.ts
 export default defineNuxtPlugin((nuxtApp) => {
   const toast = useToast()
   const api = $fetch.create({

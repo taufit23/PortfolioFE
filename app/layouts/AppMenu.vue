@@ -15,7 +15,7 @@
                 items: [{
                     label: 'User Management',
                     icon: 'pi pi-fw pi-home',
-                    to: '/'
+                    to: '/authenticated/user-management/'
                 }],
             }
         ]);

@@ -1,20 +1,28 @@
 export default defineNuxtRouteMiddleware((to, from) => {
-    const token = useCookie('token'); // Cek token dari cookie
-    const user = useCookie('user'); // Cek user dari cookie
-    const permissions = useCookie('permissions'); // Ambil permissions
+    const token = useCookie("token");
+    const user = useCookie("user");
+    const permissions = useCookie("permissions");
 
     if (!token.value || !user.value)
     {
-        return navigateTo('/auth/login'); // Redirect kalau belum login
+        return navigateTo("/auth/login");
     }
 
-    // Opsional: Kalau mau cek permission buat route tertentu, bisa pakai meta
+    let userPermissions = [];
+    try
+    {
+        userPermissions = JSON.parse(permissions.value || "[]").map((p) => p.slug);
+    } catch (error)
+    {
+        console.error("Error parsing permissions:", error);
+    }
+
     if (to.meta.requiredPermission)
     {
         const requiredPermission = to.meta.requiredPermission;
-        if (!permissions.value?.includes(requiredPermission))
+        if (!userPermissions.includes(requiredPermission))
         {
-            return navigateTo('/auth/access'); // Redirect kalau nggak punya izin
+            return navigateTo("/auth/access");
         }
     }
 });

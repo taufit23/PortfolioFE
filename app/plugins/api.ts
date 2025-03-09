@@ -3,7 +3,6 @@ export default defineNuxtPlugin((nuxtApp) => {
   const toast = useToast()
   const api = $fetch.create({
     onRequest({ request }) {
-      console.log('Sending request to ' + request)
     },
     async onResponseError({ response }) {
       if (response.status === 401 || response.status === 403)

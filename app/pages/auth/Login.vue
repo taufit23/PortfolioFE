@@ -55,9 +55,7 @@
             );
 
             navigateTo('/authenticated/dashboard'); // Arahkan ke dashboard setelah login
-        } catch (error) {
-            console.error('Login gagal', error);
-        }
+        } catch (error) {}
     };
 </script>
 

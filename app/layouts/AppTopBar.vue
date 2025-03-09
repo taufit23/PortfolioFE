@@ -36,7 +36,7 @@
 
     const topbarMenuClasses = computed(() => ({
         'layout-topbar-menu-mobile-active': topbarMenuActive.value
-    }))
+    }));
 
     const bindOutsideClickListener = () => {
         if (!outsideClickListener.value) {
@@ -48,14 +48,14 @@
             }
             document.addEventListener('mousedown', outsideClickListener.value) // 🔥 Ganti 'click' ke 'mousedown'
         }
-    }
+    };
 
     const unbindOutsideClickListener = () => {
         if (outsideClickListener.value) {
             document.removeEventListener('mousedown', outsideClickListener.value)
             outsideClickListener.value = null
         }
-    }
+    };
 
     // 🔥 Fix isOutsideClicked supaya lebih akurat
     const isOutsideClicked = (event) => {
@@ -68,7 +68,7 @@
             !event.composedPath().includes(topbarEl) &&
             !event.composedPath().includes(profileMenuEl)
         )
-    }
+    };
 </script>
 
 <template>

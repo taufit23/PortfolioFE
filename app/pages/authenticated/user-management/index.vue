@@ -238,7 +238,7 @@
             default:
                 return null;
         }
-    }
+    };
 </script>
 <template>
     <div>

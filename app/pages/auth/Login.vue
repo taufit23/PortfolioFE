@@ -3,24 +3,30 @@
         layout: false,
         middleware: 'guest'
     });
+    import {
+        useToast
+    } from "primevue/usetoast";
 
+    const toast = useToast();
     const email = ref('');
     const password = ref('');
     const checked = ref(false);
     const config = useRuntimeConfig();
+    const loading = ref(false);
 
     const baseURL = config.public.API_BASE_URL;
     const token = useCookie('token', {
         maxAge: 60 * 60
-    }); // Token bertahan 7 hari
+    });
     const user = useCookie('user', {
         maxAge: 60 * 60
-    }); // User data bertahan 7 hari
+    });
     const permissions = useCookie('permissions', {
         maxAge: 60 * 60
-    }); // Simpan permission user
+    });
 
     const login = async () => {
+        loading.value = true;
         try {
             const response = await $fetch(`${baseURL}auth/login`, {
                 method: 'POST',
@@ -30,10 +36,7 @@
                 }
             });
 
-            // Simpan token
             token.value = response.access_token;
-
-            // Simpan data user
             user.value = {
                 name: response.user.name,
                 username: response.user.username,
@@ -44,7 +47,6 @@
                 }))
             };
 
-            // Simpan permission sebagai object dari masing-masing permission
             permissions.value = response.user.roles.flatMap(role =>
                 role.permision.map(perm => ({
                     id: perm.id,
@@ -54,13 +56,30 @@
                 }))
             );
 
-            navigateTo('/authenticated/dashboard'); // Arahkan ke dashboard setelah login
-        } catch (error) {}
+            toast.add({
+                severity: "success",
+                summary: "Login Berhasil",
+                detail: `Selamat datang, ${response.user.name}!`,
+                life: 3000
+            });
+            navigateTo('/authenticated/dashboard');
+        } catch (error) {
+            toast.add({
+                severity: "error",
+                summary: "Login Gagal",
+                detail: error?.data?.message || "Email atau password salah!",
+                life: 3000
+            });
+        } finally {
+            loading.value = false;
+        }
     };
 </script>
 
 
 <template>
+    <Toast :base-z-index="999" />
+
     <div
         class="bg-surface-50 dark:bg-surface-950 flex items-center justify-center min-h-screen min-w-[100vw] overflow-hidden">
         <div class="flex flex-col items-center justify-center">
@@ -113,7 +132,8 @@
                                     class="font-medium no-underline ml-2 text-right cursor-pointer text-primary">Forgot
                                     password?</span>
                             </div>
-                            <Button label="Sign In" class="w-full" type="submit" />
+                            <Button label="Sign In" icon="pi pi-sign-in" :loading="loading" class="w-full"
+                                type="submit" />
                         </form>
                     </div>
                 </div>

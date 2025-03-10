@@ -1,8 +1,4 @@
-<script setup>
-    definePageMeta({
-        layout: false,
-    });
-</script>
+<script setup></script>
 
 <template>
     <div class="flex items-center justify-center min-h-screen overflow-hidden">

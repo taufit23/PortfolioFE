@@ -97,13 +97,15 @@
                     <span>Profile</span>
                 </button>
                 <div v-if="profileMenuActive" ref="profileMenu"
-                    class="profile-menu absolute right-0 mt-2 w-40 bg-white shadow-lg rounded-md p-2">
+                    :class="['profile-menu', 'absolute right-0 mt-2 w-40 shadow-lg rounded-md p-2', { 'bg-white': !
+                        isDarkTheme, 'bg-gray-800 text-white': isDarkTheme }]">
                     <NuxtLink to="/authenticated/profile"
-                        class="w-full text-left px-4 py-2 flex items-center gap-2 hover:bg-gray-100">
+                        class="w-full text-left px-4 py-2 flex items-center gap-2 hover:bg-gray-100 dark:hover:bg-gray-700">
                         <i class="pi pi-user" />
                         <span>Profile</span>
                     </NuxtLink>
-                    <button class="w-full text-left px-4 py-2 flex items-center gap-2 hover:bg-gray-100"
+                    <button
+                        class="w-full text-left px-4 py-2 flex items-center gap-2 hover:bg-gray-100 dark:hover:bg-gray-700"
                         @click="logout">
                         <i class="pi pi-sign-out" />
                         <span>Logout</span>

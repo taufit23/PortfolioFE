@@ -103,13 +103,14 @@
 
                             <label for="email1"
                                 class="block text-surface-900 dark:text-surface-0 text-xl font-medium mb-2">Email</label>
-                            <InputText id="email1" v-model="email" type="text" placeholder="Email address"
-                                class="w-full md:w-[30rem] mb-8" />
+                            <InputText v-tooltip="'Your username or Email'" id="email1" v-model="email"
+                                type="text" placeholder="Email address" class="w-full md:w-[30rem] mb-8" />
 
                             <label for="password1"
                                 class="block text-surface-900 dark:text-surface-0 font-medium text-xl mb-2">Password</label>
-                            <Password id="password1" v-model="password" placeholder="Password" :toggle-mask="true"
-                                class="mb-4" fluid :feedback="false" />
+                            <Password v-tooltip="'Your Strong Password'" id="password1" v-model="password"
+                                placeholder="Password" :toggle-mask="true" class="mb-4" fluid
+                                :feedback="false" />
 
                             <div class="flex items-center justify-between mt-2 mb-8 gap-8">
                                 <div class="flex items-center">

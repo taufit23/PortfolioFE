@@ -43,6 +43,9 @@
         use_custom_permissions: false,
         permissions: [] // Akan diisi dengan id dari userPermissions
     });
+    const editUserDialog = ref(false); // Dialog edit user
+    const userDetailDialog = ref(false); // Dialog detail user
+    const selectedUser = ref(null); // Data user yang dipilih
     // === create new user ===
     async function saveNewUser() {
         buttonLoading.value = true;
@@ -128,8 +131,6 @@
             buttonLoading.value = false;
         }
     }
-    const userDetailDialog = ref(false); // State untuk pop-up detail user
-    const selectedUser = ref(null); // State untuk menyimpan data user yang dipilih
 
     // === FETCH DATA USERS ===
     async function fetchUser() {

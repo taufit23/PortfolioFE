@@ -42,7 +42,7 @@
     });
     // === create new user ===
     async function saveNewUser() {
-        buttonLoading.value = false;
+        buttonLoading.value = true;
         try {
             const response = await $fetch(`${baseURL}user-management/createUser`, {
                 method: "POST",

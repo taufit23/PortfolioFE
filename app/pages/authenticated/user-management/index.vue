@@ -7,6 +7,9 @@
         layout: 'authenticated',
         middleware: 'auth'
     });
+    const {
+        $showToast
+    } = useNuxtApp();
 
     // Import library yang dibutuhkan
     import {
@@ -56,25 +59,18 @@
             if (response) {
                 // Tambahkan user yang baru dibuat ke dalam daftar users
                 users.value.push(response.data);
-
-                toast.add({
-                    severity: "success",
-                    summary: "Success",
-                    detail: "User successfully created!",
-                    life: 3000,
-                });
+                console.log(response.data);
+                $showToast("success", "Success", "User successfully created!");
 
                 createUserDialog.value = false; // Tutup dialog setelah sukses
                 resetNewUser(); // Reset form setelah berhasil
             }
         } catch (err) {
-            console.error("Error creating user:", err);
-            toast.add({
-                severity: "error",
-                summary: "Error",
-                detail: err.message,
-                life: 3000,
-            });
+            err.data.message
+            const errorMessage = err.data ? err.data.message || Object.values(err.data.errors || {}).flat().join(
+                "\n") : "-";
+
+            $showToast("error", "Error", errorMessage);
         } finally {
             buttonLoading.value = false;
         }
@@ -97,6 +93,41 @@
         };
     }
 
+    function editUser(user) {
+        editedUser.value = {
+            ...user
+        };
+        editUserDialog.value = true;
+    }
+    const editedUser = ref({});
+
+    async function saveEditedUser() {
+        buttonLoading.value = true;
+        try {
+            await $fetch(`${baseURL}user-management/updateUser`, {
+                method: "PUT",
+                headers: {
+                    "Authorization": `Bearer ${token.value.trim()}`,
+                    "Content-Type": "application/json",
+                },
+                body: editedUser.value,
+            });
+
+            const index = users.value.findIndex(u => u.id === editedUser.value.id);
+            if (index !== -1) users.value[index] = {
+                ...editedUser.value
+            };
+
+            $showToast("success", "Success", "Success Edit");
+
+            editUserDialog.value = false;
+        } catch (err) {
+            console.error("Error updating user:", err);
+            $showToast("error", "Error", err.message);
+        } finally {
+            buttonLoading.value = false;
+        }
+    }
     const userDetailDialog = ref(false); // State untuk pop-up detail user
     const selectedUser = ref(null); // State untuk menyimpan data user yang dipilih
 
@@ -113,21 +144,11 @@
             });
 
             users.value = data?.data || []; // Simpan hasil ke users
+            $showToast("success", "Success", data?.statusMessage);
 
-            toast.add({
-                severity: "success",
-                summary: "Success",
-                detail: data?.statusMessage || "Users fetched successfully",
-                life: 3000,
-            });
         } catch (err) {
-            console.error("Error fetching users:", err);
-            toast.add({
-                severity: "error",
-                summary: "Error",
-                detail: err?.response?._data?.message || "An error occurred while fetching users",
-                life: 3000,
-            });
+            const errorMessage = err?.response?._data?.message;
+            $showToast("error", "Error", errorMessage);
         } finally {
             isLoading.value = false; // Set loading ke false setelah fetch selesai
         }
@@ -155,22 +176,14 @@
             });
 
             // Jika request berhasil
-            toast.add({
-                severity: "success",
-                summary: data.statusMessage || "User detail loaded successfully",
-                life: 3000,
-            });
+            $showToast("success", "Success", data.statusMessage);
+
 
             selectedUser.value = data?.data || null;
             userDetailDialog.value = true;
         } catch (err) {
-            console.error("Error fetching user detail:", err);
-            toast.add({
-                severity: "error",
-                summary: "Error",
-                detail: err?.response?._data?.message || "Terjadi kesalahan saat mengambil data user",
-                life: 3000,
-            });
+            const errorMessage = err?.response?._data?.message;
+            $showToast("error", "Error", errorMessage);
         }
     }
 
@@ -236,20 +249,10 @@
 
             // Simpan hasil ke userRoles
             userRoles.value = data?.data || [];
-
-            toast.add({
-                severity: "success",
-                summary: "Success",
-                detail: data.statusMessage || "Roles fetched successfully",
-                life: 3000,
-            });
+            $showToast("success", "Success", data.statusMessage);
         } catch (err) {
-            toast.add({
-                severity: "error",
-                summary: "Error",
-                detail: err?.response?._data?.message || "Failed to fetch roles",
-                life: 3000,
-            });
+            const errorMessage = err?.response?._data?.message;
+            $showToast("error", "Error", errorMessage);
         }
     }
 
@@ -266,20 +269,11 @@
 
             // Set data jika berhasil
             userPermissions.value = data?.data || [];
+            $showToast("success", "Success", data.statusMessage);
 
-            toast.add({
-                severity: "success",
-                summary: "Success",
-                detail: data.statusMessage || "Permissions fetched successfully",
-                life: 3000,
-            });
         } catch (err) {
-            toast.add({
-                severity: "error",
-                summary: "Error",
-                detail: err?.response?._data?.message || "Failed to fetch permissions",
-                life: 3000,
-            });
+            const errorMessage = err?.response?._data?.message;
+            $showToast("error", "Error", errorMessage);
         }
     }
     // === on app load ===
@@ -330,6 +324,7 @@
                         <template #body="slotProps">
                             <Button icon="pi pi-pencil" outlined rounded class="mr-2"
                                 @click="editUser(slotProps.data)" />
+
                             <Button icon="pi pi-eye" outlined rounded class="mr-2" severity="info"
                                 @click="showDetailUser(slotProps.data)" />
                             <Button icon="pi pi-trash" outlined rounded class="mr-2" severity="danger"
@@ -340,6 +335,31 @@
             </div>
         </div>
 
+        <Dialog v-model:visible="editUserDialog" :style="{ width: '50vw' }" header="Edit User" :modal="true">
+            <div class="flex flex-col gap-4">
+                <label for="edit-username">Username</label>
+                <InputText id="edit-username" v-model="editedUser.username" disabled />
+
+                <label for="edit-name">Name</label>
+                <InputText id="edit-name" v-model="editedUser.name" />
+
+                <label for="edit-email">Email</label>
+                <InputText id="edit-email" v-model="editedUser.email" />
+
+                <label for="edit-roles">Roles</label>
+                <MultiSelect id="edit-roles" v-model="editedUser.roles" :options="userRoles" optionLabel="role_name"
+                    optionValue="id" placeholder="Select roles" />
+
+                <label for="edit-permissions">Permissions</label>
+                <MultiSelect id="edit-permissions" v-model="editedUser.permissions" :options="userPermissions"
+                    optionLabel="permision_name" optionValue="id" placeholder="Select permissions" />
+            </div>
+
+            <template #footer>
+                <Button label="Cancel" icon="pi pi-times" text @click="editUserDialog = false" />
+                <Button label="Save" icon="pi pi-check" @click="saveEditedUser" :loading="buttonLoading" />
+            </template>
+        </Dialog>
 
         <Dialog v-model:visible="userDetailDialog" :style="{ width: '450px' }" header="User Detail"
             :modal="true">

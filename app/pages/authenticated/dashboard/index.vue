@@ -14,12 +14,7 @@
     };
 
     const showToast = () => {
-        toast.add({
-            severity: "info",
-            summary: "Info",
-            detail: "This is a test toast message!",
-            life: 3000, // Durasi tampil dalam milidetik
-        });
+        $showToast("error", "Error", 'Test Error Toast');
     };
 
     definePageMeta({

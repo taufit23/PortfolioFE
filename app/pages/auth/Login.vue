@@ -55,21 +55,10 @@
                     is_menu: perm.is_menu
                 }))
             );
-
-            toast.add({
-                severity: "success",
-                summary: "Login Berhasil",
-                detail: `Selamat datang, ${response.user.name}!`,
-                life: 3000
-            });
+            $showToast("success", "Login Succesfully!", `Wellcome, ${response.user.name}`);
             navigateTo('/authenticated/dashboard');
         } catch (error) {
-            toast.add({
-                severity: "error",
-                summary: "Login Gagal",
-                detail: error?.data?.message || "Email atau password salah!",
-                life: 3000
-            });
+            $showToast("error", "Login Fail", errorMessage);
         } finally {
             loading.value = false;
         }

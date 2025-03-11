@@ -3,10 +3,9 @@
         layout: false,
         middleware: 'guest'
     });
-    import {
-        useToast
-    } from "primevue/usetoast";
-
+    const {
+        $showToast
+    } = useNuxtApp();
     const toast = useToast();
     const email = ref('');
     const password = ref('');

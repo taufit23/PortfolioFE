@@ -1,10 +1,7 @@
 <script setup>
-    import {
-        useToast
-    } from "primevue/usetoast";
-
-    const toast = useToast();
-
+    const {
+        $showToast
+    } = useNuxtApp();
     const onThrow = () => {
         throw createError({
             statusCode: 500,

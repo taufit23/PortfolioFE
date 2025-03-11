@@ -1,7 +1,7 @@
 <script setup></script>
 
 <template>
-    <div class="layout-footer">
-        <span class="font-medium ml-2"></span>
-    </div>
+  <div class="layout-footer">
+    <span class="font-medium ml-2" />
+  </div>
 </template>

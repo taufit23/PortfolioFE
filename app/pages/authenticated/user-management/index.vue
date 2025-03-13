@@ -1,6 +1,17 @@
 <script setup>
+ //taufit23/issue2
     // pages/authenticated/user-management/index.vue
 
+    // user-management/index.vue
+    // done edit Permissions
+    // === PAGE META & IMPORTS ===
+    // Konfigurasi layout dan middleware
+    definePageMeta({
+        layout: 'authenticated',
+        middleware: 'auth'
+    });
+
+    // Import library yang dibutuhkan
     import {
         FilterMatchMode
     } from "@primevue/core/api";

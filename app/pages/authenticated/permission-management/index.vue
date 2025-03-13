@@ -21,6 +21,7 @@
 
     const isLoading = ref(true);
     const buttonLoading = ref(false);
+    const loadingMap = ref({}); // 🔥 Map buat track loading per item
 
     const dt = ref();
     const filters = ref({
@@ -35,6 +36,7 @@
     const updatePermisionDialog = ref(false);
     const permissionData = ref({});
 
+    const permissionDetailDialog = ref(false);
     // NOTE: Define Functions
     function openCreatePermision() {
         craetePermisionDialog.value = true;
@@ -117,13 +119,11 @@
         permissionData.value = {
             ...permission
         };
-        console.log(permissionData);
         updatePermisionDialog.value = true;
     }
 
     // Perbaiki fungsi updatePermission agar menggunakan PUT
     async function updatePermission(permissionData) {
-        buttonLoading.value = true;
         try {
             const response = await $fetch(
                 `${baseURL}manage-permissions/update`, {
@@ -151,10 +151,38 @@
                 "-";
 
             $showToast("error", "Error", errorMessage);
-        } finally {
-            buttonLoading.value = false;
         }
     }
+
+    async function showDetailPermision(permission) {
+        loadingMap.value[permission.id] = true; // ✅ Aktifkan loading khusus tombol ini
+        try {
+            const data = await $fetch(`${baseURL}manage-permissions/show`, {
+                method: "POST",
+                headers: {
+                    Authorization: `Bearer ${token.value.trim()}`,
+                    Accept: "application/json",
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    permision_id: permission.id
+                }),
+            });
+
+            if (data?.data) {
+                permissionData.value = data.data;
+            }
+
+            $showToast("success", "Success", data.statusMessage);
+            permissionDetailDialog.value = true;
+        } catch (err) {
+            const errorMessage = err?.response?._data?.message;
+            $showToast("error", "Error", errorMessage);
+        } finally {
+            loadingMap.value[permission.id] = false; // ✅ Matikan loading khusus tombol ini
+        }
+    }
+
     onMounted(async () => {
         fetchpermissionLists();
     });
@@ -207,7 +235,11 @@
                                 @click="editPermission(slotProps.data)" />
 
                             <Button icon="pi pi-eye" outlined rounded class="mr-2" severity="info"
-                                @click="showDetailPermision(slotProps.data)" />
+                                @click="showDetailPermision(slotProps.data)"
+                                :loading="loadingMap[slotProps.data.id] || false"
+                                :disabled="loadingMap[slotProps.data.id] || false" />
+
+
                             <Button icon="pi pi-trash" outlined rounded class="mr-2" severity="danger"
                                 @click="confirmDeletePermission(slotProps.data)" />
                         </template>
@@ -217,7 +249,12 @@
         </div>
         <PermissionCreatePermissionDialog :visible="craetePermisionDialog" :permissions="permissionLists"
             @update:visible="craetePermisionDialog = $event" @save-permission="saveNewPermission" />
+
         <PermissionEditPermissionDialog :visible="updatePermisionDialog" :permission="permissionData"
             @update:visible="updatePermisionDialog = $event" @update-permission="updatePermission" />
+
+        <PermissionDetailPermissionDialog :visible="permissionDetailDialog" :permission="permissionData"
+            @update:visible="permissionDetailDialog = $event" />
+
     </div>
 </template>

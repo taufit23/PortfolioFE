@@ -7,7 +7,7 @@
                 items: [{
                     label: 'Dashboard',
                     icon: 'pi pi-fw pi-home',
-                    to: '/authenticated/dashboard'
+                    to: '/authenticated/dashboard',
                 }],
             },
             {
@@ -18,12 +18,16 @@
                         items: [{
                             label: 'User Management',
                             icon: 'pi pi-fw pi-user',
-                            to: '/authenticated/user-management/'
+                            to: '/authenticated/user-management/',
                         }, {
-                            label: 'Roles',
+                            label: 'Roles Management',
                             icon: 'pi pi-fw pi-key',
-                            to: '/'
-                        }]
+                            to: '/authenticated/roles-management/',
+                        }, {
+                            label: 'Permission Management',
+                            icon: 'pi pi-fw pi-lock-open',
+                            to: '/authenticated/permission-management/',
+                        }],
                     },
                     {
                         label: 'Submenu 2',
@@ -33,28 +37,28 @@
                                 icon: 'pi pi-fw pi-bookmark',
                                 items: [{
                                         label: 'Submenu 2.1.1',
-                                        icon: 'pi pi-fw pi-bookmark'
+                                        icon: 'pi pi-fw pi-bookmark',
                                     },
                                     {
                                         label: 'Submenu 2.1.2',
-                                        icon: 'pi pi-fw pi-bookmark'
-                                    }
-                                ]
+                                        icon: 'pi pi-fw pi-bookmark',
+                                    },
+                                ],
                             },
                             {
                                 label: 'Submenu 2.2',
                                 icon: 'pi pi-fw pi-bookmark',
                                 items: [{
                                     label: 'Submenu 2.2.1',
-                                    icon: 'pi pi-fw pi-bookmark'
-                                }]
-                            }
-                        ]
-                    }
-                ]
+                                    icon: 'pi pi-fw pi-bookmark',
+                                }],
+                            },
+                        ],
+                    },
+                ],
             },
-        ]
-    );
+        ],
+    )
 </script>
 
 <template>

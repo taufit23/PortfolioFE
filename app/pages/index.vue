@@ -1,12 +1,11 @@
 <script setup lang="ts">
-    definePageMeta({
-        layout: 'default'
-    });
+definePageMeta({
+  layout: 'default',
+})
 </script>
 
-
 <template>
-    <div class="card">
-        <h1>Home</h1>
-    </div>
+  <div class="card">
+    <h1>Home</h1>
+  </div>
 </template>

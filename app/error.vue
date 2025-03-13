@@ -1,19 +1,19 @@
 <script setup lang="ts">
-    // app/utils/error.vue
-    import type {
-        NuxtError
-    } from '#app'
+// app/utils/error.vue
+import type {
+  NuxtError,
+} from '#app'
 
-    const {
-        error
-    } = defineProps({
-        error: Object as() => NuxtError,
-    });
+const {
+  error,
+} = defineProps({
+  error: Object as () => NuxtError,
+})
 </script>
 
 <template>
-    <NotFound v-if="error?.statusCode === 404" />
-    <FatalError v-else-if="error" />
+  <NotFound v-if="error?.statusCode === 404" />
+  <FatalError v-else-if="error" />
 </template>
 
 <style scoped lang="scss">

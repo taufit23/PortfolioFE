@@ -20,12 +20,18 @@
     const config = useRuntimeConfig();
     const baseURL = config.public.API_BASE_URL;
     const token = useCookie("token");
+    const {
+        loadingMap: loadingDetailMap,
+        setLoading: setDetailLoading
+    } = useItemLoading()
+    const {
+        loadingMap: loadingDeleteMap,
+        setLoading: setDeleteLoading
+    } = useItemLoading()
+
 
     const isLoading = ref(true);
     const buttonLoading = ref(false);
-    const loadingDetailMap = ref({});
-    const loadingDeleteMap = ref({});
-
 
     const dt = ref();
     const filters = ref({
@@ -154,7 +160,7 @@
     }
 
     async function showDetailPermision(permission) {
-        loadingDetailMap.value[permission.id] = true;
+        setDetailLoading(permission.id, true)
         try {
             const data = await $fetch(`${baseURL}manage-permissions/show`, {
                 method: "POST",
@@ -174,11 +180,13 @@
             const errorMessage = err?.response?._data?.message;
             $showToast("error", "Error", errorMessage);
         } finally {
-            loadingDetailMap.value[permission.id] = false;
+            setDetailLoading(permission.id, false)
         }
     }
+
     async function confirmDeletePermission(permission) {
-        loadingDeleteMap.value[permission.id] = true;
+        setDeleteLoading(permission.id, true)
+
         try {
             const data = await $fetch(`${baseURL}manage-permissions/show`, {
                 method: "POST",
@@ -188,7 +196,6 @@
                     is_deletable: true
                 }),
             });
-            console.log(data);
 
             if (data?.data) {
                 const permissionData = data.data;
@@ -201,9 +208,10 @@
             const errorMessage = err?.response?._data?.message;
             $showToast("error", "Error", errorMessage);
         } finally {
-            loadingDeleteMap.value[permission.id] = false;
+            setDeleteLoading(permission.id, false)
         }
     }
+
     async function deletePermission(permission) {
         buttonLoading.value = true;
         try {
@@ -280,10 +288,11 @@
                                 @click="showDetailPermision(slotProps.data)"
                                 :loading="loadingDetailMap[slotProps.data.id] || false"
                                 :disabled="loadingDetailMap[slotProps.data.id] || false" />
+
                             <Button icon="pi pi-trash" outlined rounded class="mr-2" severity="danger"
+                                @click="confirmDeletePermission(slotProps.data)"
                                 :loading="loadingDeleteMap[slotProps.data.id] || false"
-                                :disabled="loadingDeleteMap[slotProps.data.id] || false"
-                                @click="confirmDeletePermission(slotProps.data)" />
+                                :disabled="loadingDeleteMap[slotProps.data.id] || false" />
 
                         </template>
                     </Column>

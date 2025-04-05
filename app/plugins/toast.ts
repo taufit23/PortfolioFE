@@ -1,7 +1,7 @@
 export default defineNuxtPlugin((nuxtApp) => {
   const toast = useToast()
 
-  const showToast = (severity, summary, detail) => {
+  const showToast = (severity: any, summary: any, detail: any) => {
     toast.add({
       severity,
       summary,

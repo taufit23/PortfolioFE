@@ -14,6 +14,14 @@
     const {
         $showToast
     } = useNuxtApp();
+    const {
+        loadingMap: loadingDetailMap,
+        setLoading: setDetailLoading
+    } = useItemLoading()
+    const {
+        loadingMap: loadingDeleteMap,
+        setLoading: setDeleteLoading
+    } = useItemLoading()
 
     const config = useRuntimeConfig();
     const baseURL = config.public.API_BASE_URL;
@@ -130,7 +138,58 @@
             buttonLoading.value = false;
         }
     }
+    async function showDetailRole(role) {
+        setDetailLoading(role.id, true)
+        try {
+            const data = await $fetch(`${baseURL}manage-roles/show`, {
+                method: "POST",
+                headers: {
+                    Authorization: `Bearer ${token.value.trim()}`,
+                    Accept: "application/json",
+                },
+                body: {
+                    role_id: role.id
+                },
+            })
 
+            // Tampilkan data ke dialog detail (belum ditampilkan di UI ya, tinggal lo tambahin kalau butuh)
+            console.log("Detail:", data.data)
+            $showToast("success", "Success", data.statusMessage)
+        } catch (err) {
+            const errorMessage = err?.response?._data?.message
+            $showToast("error", "Error", errorMessage)
+        } finally {
+            setDetailLoading(role.id, false)
+        }
+    }
+
+    async function confirmDeleteRole(role) {
+        setDeleteLoading(role.id, true)
+        try {
+            const data = await $fetch(`${baseURL}manage-roles/show`, {
+                method: "POST",
+                headers: {
+                    Authorization: `Bearer ${token.value.trim()}`,
+                    Accept: "application/json",
+                },
+                body: {
+                    role_id: role.id,
+                    is_deletable: true
+                },
+            })
+
+            // Contoh konfirmasi log
+            console.log("Can be deleted:", data.data)
+
+            $showToast("success", "Success", data.statusMessage)
+            // Tinggal munculin dialog konfirmasi delete kalau mau (lo bisa trigger modal dari sini)
+        } catch (err) {
+            const errorMessage = err?.response?._data?.message
+            $showToast("error", "Error", errorMessage)
+        } finally {
+            setDeleteLoading(role.id, false)
+        }
+    }
     onMounted(async () => {
         fetchrolesLists();
         fetchpermisionLists();
@@ -182,9 +241,15 @@
                                 @click="editRole(slotProps.data)" />
 
                             <Button icon="pi pi-eye" outlined rounded class="mr-2" severity="info"
-                                @click="showDetailRole(slotProps.data)" />
+                                @click="showDetailRole(slotProps.data)"
+                                :loading="loadingDetailMap[slotProps.data.id] || false"
+                                :disabled="loadingDetailMap[slotProps.data.id] || false" />
+
                             <Button icon="pi pi-trash" outlined rounded class="mr-2" severity="danger"
-                                @click="confirmDeleteRole(slotProps.data)" />
+                                @click="confirmDeleteRole(slotProps.data)"
+                                :loading="loadingDeleteMap[slotProps.data.id] || false"
+                                :disabled="loadingDeleteMap[slotProps.data.id] || false" />
+
                         </template>
                     </Column>
                 </DataTable>

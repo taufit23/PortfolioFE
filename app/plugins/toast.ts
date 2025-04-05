@@ -1,12 +1,15 @@
+// plugins/toast.ts
 export default defineNuxtPlugin((nuxtApp) => {
   const toast = useToast()
 
-  const showToast = (severity: any, summary: any, detail: any) => {
+  type ToastType = 'success' | 'error' | 'warn' | 'info'
+
+  const showToast = (type: ToastType, title: string, message: string, duration: number = 3000) => {
     toast.add({
-      severity,
-      summary,
-      detail,
-      life: 3000,
+      severity: type,
+      summary: title,
+      detail: message,
+      life: duration,
     })
   }
 

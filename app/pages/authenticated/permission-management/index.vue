@@ -82,7 +82,7 @@
             $showToast("success", "Success", data.statusMessage);
         } catch (err) {
             const errorMessage = err?.response?._data?.message;
-            $showToast("error", "Error", errorMessage);
+            $showToast("error", "Opps!...", errorMessage);
         } finally {
             isLoading.value = false;
         }
@@ -115,7 +115,7 @@
                 .flat()
                 .join("\n") :
                 "-";
-            $showToast("error", "Error", errorMessage);
+            $showToast("error", "Opps!...", errorMessage);
         } finally {
             buttonLoading.value = false;
         }
@@ -155,7 +155,7 @@
                 err.data.message || Object.values(err.data.errors || {}).flat().join("\n") :
                 "-";
 
-            $showToast("error", "Error", errorMessage);
+            $showToast("error", "Opps!...", errorMessage);
         }
     }
 
@@ -173,12 +173,11 @@
             if (data?.data) {
                 permissionData.value = data.data;
             }
-
-            $showToast("success", "Success", data.statusMessage);
             permissionDetailDialog.value = true;
+            $showToast("success", "Success", data.statusMessage);
         } catch (err) {
             const errorMessage = err?.response?._data?.message;
-            $showToast("error", "Error", errorMessage);
+            $showToast("error", "Opps!...", errorMessage);
         } finally {
             setDetailLoading(permission.id, false)
         }
@@ -206,7 +205,7 @@
             $showToast("success", "Success", data.statusMessage);
         } catch (err) {
             const errorMessage = err?.response?._data?.message;
-            $showToast("error", "Error", errorMessage);
+            $showToast("error", "Opps!...", errorMessage);
         } finally {
             setDeleteLoading(permission.id, false)
         }
@@ -228,7 +227,7 @@
             deleteConfirmDialog.value = false;
         } catch (err) {
             const errorMessage = err?.response?._data?.message;
-            $showToast("error", "Error", errorMessage);
+            $showToast("error", "Opps!...", errorMessage);
         } finally {
             buttonLoading.value = false;
         }

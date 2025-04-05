@@ -291,7 +291,8 @@
             </div>
         </div>
         <PermissionCreatePermissionDialog :visible="craetePermisionDialog" :permissions="permissionLists"
-            @update:visible="craetePermisionDialog = $event" @save-permission="saveNewPermission" />
+            :buttonLoading="buttonLoading" @update:visible="craetePermisionDialog = $event"
+            @save-permission="saveNewPermission" />
 
         <PermissionEditPermissionDialog :visible="updatePermisionDialog" :permission="permissionData"
             @update:visible="updatePermisionDialog = $event" @update-permission="updatePermission" />

@@ -8,6 +8,8 @@
 
     const props = defineProps({
         visible: Boolean,
+        buttonLoading: Boolean, // ✅ Tambahan
+
     });
 
     // Emit untuk komunikasi dengan parent
@@ -55,7 +57,9 @@
 
         <template #footer>
             <Button label="Cancel" icon="pi pi-times" text @click="closeDialog" />
-            <Button label="Save" icon="pi pi-check" @click="savePermission" />
+            <Button label="Save" icon="pi pi-check" :loading="props.buttonLoading" :disabled="props.buttonLoading"
+                @click="savePermission" />
+
         </template>
     </Dialog>
 </template>

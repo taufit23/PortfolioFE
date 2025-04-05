@@ -1,4 +1,5 @@
 <script setup>
+    //login.vue
     definePageMeta({
         layout: false,
         middleware: 'guest',
@@ -23,7 +24,6 @@
     const permissions = useCookie('permissions', {
         maxAge: 60 * 60,
     })
-
     const login = async () => {
         loading.value = true
         try {
@@ -54,14 +54,22 @@
                     is_menu: perm.is_menu,
                 })),
             )
-            $showToast('success', 'Login Succesfully!', `Wellcome, ${response.user.name}`)
+            $showToast('success', 'Login Successfully!', `Welcome, ${response.user.name}`)
             navigateTo('/authenticated/dashboard')
         } catch (error) {
-            $showToast('error', 'Login Fail', errorMessage)
+            let userMessage = 'Terjadi kesalahan, coba lagi nanti.'
+
+            // Jika error ada response-nya, simpan pesan yang lebih friendly
+            if (error?.data?.message) {
+                userMessage = error.data.message
+            }
+
+            // Tampilkan error ke UI tanpa bocorin URL BE
+            $showToast('error', 'Login Failed', userMessage)
         } finally {
             loading.value = false
         }
-    };
+    }
 </script>
 
 <template>
@@ -98,31 +106,42 @@
                     </div>
 
                     <div>
-                        <form @submit.prevent="login">
+                        <!-- Fake Input Biar Chrome Bingung -->
+                        <input type="text" name="fakeuser" style="display:none;" autocomplete="off" />
+
+                        <form @submit.prevent="login" autocomplete="off" novalidate>
                             <label for="email1"
                                 class="block text-surface-900 dark:text-surface-0 text-xl font-medium mb-2">Email</label>
-                            <InputText id="email1" v-model="email" v-tooltip="'Your username or Email'"
-                                type="text" placeholder="Email address" class="w-full md:w-[30rem] mb-8" />
+                            <InputText id="email1" v-model="email" type="text" placeholder="Email address"
+                                class="w-full md:w-[30rem] mb-8" autocomplete="off" autocorrect="off"
+                                spellcheck="false" />
 
                             <label for="password1"
                                 class="block text-surface-900 dark:text-surface-0 font-medium text-xl mb-2">Password</label>
-                            <Password id="password1" v-model="password" v-tooltip="'Your Strong Password'"
-                                placeholder="Password" :toggle-mask="true" class="mb-4" fluid
-                                :feedback="false" />
+
+                            <!-- Input Fake untuk Mencegah AutoFill -->
+                            <input type="text" name="fakeuser" style="display:none;" autocomplete="off" />
+
+                            <Password id="password1" v-model="password" placeholder="Password" :toggle-mask="true"
+                                :feedback="false" class="mb-4" fluid
+                                :input-props="{ autocomplete: 'new-password' }" autocorrect="off" spellcheck="false" />
 
                             <div class="flex items-center justify-between mt-2 mb-8 gap-8">
                                 <div class="flex items-center">
                                     <Checkbox id="rememberme1" v-model="checked" binary class="mr-2" />
                                     <label for="rememberme1">Remember me</label>
                                 </div>
-                                <span
-                                    class="font-medium no-underline ml-2 text-right cursor-pointer text-primary">Forgot
-                                    password?</span>
+                                <span class="font-medium no-underline ml-2 text-right cursor-pointer text-primary">
+                                    Forgot password?
+                                </span>
                             </div>
+
                             <Button label="Sign In" icon="pi pi-sign-in" :loading="loading" class="w-full"
                                 type="submit" />
                         </form>
+
                     </div>
+
                 </div>
             </div>
         </div>

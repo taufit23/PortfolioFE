@@ -11,6 +11,8 @@
 
     // NOTE: Define Variabel
     const selectedPermision = ref();
+    const deleteConfirmDialog = ref();
+    const selectedPermissionToDelete = ref({});
     const {
         $showToast
     } = useNuxtApp();
@@ -21,7 +23,9 @@
 
     const isLoading = ref(true);
     const buttonLoading = ref(false);
-    const loadingMap = ref({}); // 🔥 Map buat track loading per item
+    const loadingDetailMap = ref({});
+    const loadingDeleteMap = ref({});
+
 
     const dt = ref();
     const filters = ref({
@@ -35,8 +39,13 @@
     const craetePermisionDialog = ref(false);
     const updatePermisionDialog = ref(false);
     const permissionData = ref({});
-
+    const fecthHeader = {
+        Authorization: `Bearer ${token.value.trim()}`,
+        Accept: "application/json",
+        "Content-Type": "application/json",
+    };
     const permissionDetailDialog = ref(false);
+    const permissionDeleteDialog = ref(false);
     // NOTE: Define Functions
     function openCreatePermision() {
         craetePermisionDialog.value = true;
@@ -59,10 +68,7 @@
         try {
             const data = await $fetch(`${baseURL}manage-permissions`, {
                 method: "POST",
-                headers: {
-                    Authorization: `Bearer ${token.value.trim()}`,
-                    Accept: "application/json",
-                },
+                headers: fecthHeader,
             });
 
             // Set data jika berhasil
@@ -85,10 +91,7 @@
         try {
             const response = await $fetch(`${baseURL}manage-permissions/store`, {
                 method: "POST",
-                headers: {
-                    Authorization: `Bearer ${token.value.trim()}`,
-                    "Content-Type": "application/json",
-                },
+                headers: fecthHeader,
                 body: permissionData, // Gunakan data dari child component
             });
 
@@ -106,7 +109,6 @@
                 .flat()
                 .join("\n") :
                 "-";
-
             $showToast("error", "Error", errorMessage);
         } finally {
             buttonLoading.value = false;
@@ -128,10 +130,7 @@
             const response = await $fetch(
                 `${baseURL}manage-permissions/update`, {
                     method: "PUT",
-                    headers: {
-                        Authorization: `Bearer ${token.value.trim()}`,
-                        "Content-Type": "application/json",
-                    },
+                    headers: fecthHeader,
                     body: permissionData,
                 });
 
@@ -155,15 +154,11 @@
     }
 
     async function showDetailPermision(permission) {
-        loadingMap.value[permission.id] = true; // ✅ Aktifkan loading khusus tombol ini
+        loadingDetailMap.value[permission.id] = true;
         try {
             const data = await $fetch(`${baseURL}manage-permissions/show`, {
                 method: "POST",
-                headers: {
-                    Authorization: `Bearer ${token.value.trim()}`,
-                    Accept: "application/json",
-                    "Content-Type": "application/json",
-                },
+                headers: fecthHeader,
                 body: JSON.stringify({
                     permision_id: permission.id
                 }),
@@ -179,10 +174,57 @@
             const errorMessage = err?.response?._data?.message;
             $showToast("error", "Error", errorMessage);
         } finally {
-            loadingMap.value[permission.id] = false; // ✅ Matikan loading khusus tombol ini
+            loadingDetailMap.value[permission.id] = false;
         }
     }
+    async function confirmDeletePermission(permission) {
+        loadingDeleteMap.value[permission.id] = true;
+        try {
+            const data = await $fetch(`${baseURL}manage-permissions/show`, {
+                method: "POST",
+                headers: fecthHeader,
+                body: JSON.stringify({
+                    permision_id: permission.id,
+                    is_deletable: true
+                }),
+            });
+            console.log(data);
 
+            if (data?.data) {
+                const permissionData = data.data;
+                selectedPermissionToDelete.value = permissionData;
+                deleteConfirmDialog.value = true;
+            }
+            emit("update:visible", true);
+            $showToast("success", "Success", data.statusMessage);
+        } catch (err) {
+            const errorMessage = err?.response?._data?.message;
+            $showToast("error", "Error", errorMessage);
+        } finally {
+            loadingDeleteMap.value[permission.id] = false;
+        }
+    }
+    async function deletePermission(permission) {
+        buttonLoading.value = true;
+        try {
+            const data = await $fetch(`${baseURL}manage-permissions/delete`, {
+                method: "DELETE",
+                headers: fecthHeader,
+                body: {
+                    permision_id: permission.id
+                },
+            });
+
+            permissionLists.value = permissionLists.value.filter(p => p.id !== permission.id);
+            $showToast("success", "Deleted", data.statusMessage);
+            deleteConfirmDialog.value = false;
+        } catch (err) {
+            const errorMessage = err?.response?._data?.message;
+            $showToast("error", "Error", errorMessage);
+        } finally {
+            buttonLoading.value = false;
+        }
+    }
     onMounted(async () => {
         fetchpermissionLists();
     });
@@ -236,12 +278,13 @@
 
                             <Button icon="pi pi-eye" outlined rounded class="mr-2" severity="info"
                                 @click="showDetailPermision(slotProps.data)"
-                                :loading="loadingMap[slotProps.data.id] || false"
-                                :disabled="loadingMap[slotProps.data.id] || false" />
-
-
+                                :loading="loadingDetailMap[slotProps.data.id] || false"
+                                :disabled="loadingDetailMap[slotProps.data.id] || false" />
                             <Button icon="pi pi-trash" outlined rounded class="mr-2" severity="danger"
+                                :loading="loadingDeleteMap[slotProps.data.id] || false"
+                                :disabled="loadingDeleteMap[slotProps.data.id] || false"
                                 @click="confirmDeletePermission(slotProps.data)" />
+
                         </template>
                     </Column>
                 </DataTable>
@@ -255,6 +298,10 @@
 
         <PermissionDetailPermissionDialog :visible="permissionDetailDialog" :permission="permissionData"
             @update:visible="permissionDetailDialog = $event" />
+        <PermissionDeletePermissionDialog :visible="deleteConfirmDialog" :permission="selectedPermissionToDelete"
+            :buttonLoading="buttonLoading" @update:visible="deleteConfirmDialog = $event"
+            @delete-permission="deletePermission" />
+
 
     </div>
 </template>

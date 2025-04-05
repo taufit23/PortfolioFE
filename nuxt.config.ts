@@ -72,4 +72,5 @@ export default defineNuxtConfig({
       locale: { ...esLocale },
     },
   },
+
 })

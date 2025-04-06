@@ -138,6 +138,8 @@
 
     // Perbaiki fungsi updatePermission agar menggunakan PUT
     async function updatePermission(permissionData) {
+        buttonLoading.value = true;
+
         try {
             const response = await put('manage-permissions/update', permissionData);
             // Jika berhasil, update data permissionLists
@@ -154,8 +156,9 @@
             const errorMessage = err.data ?
                 err.data.message || Object.values(err.data.errors || {}).flat().join("\n") :
                 "-";
-
             $showToast("error", "Opps!...", errorMessage);
+        } finally {
+            buttonLoading.value = false;
         }
     }
 
@@ -292,7 +295,8 @@
             @save-permission="saveNewPermission" />
 
         <PermissionEditPermissionDialog :visible="updatePermisionDialog" :permission="permissionData"
-            @update:visible="updatePermisionDialog = $event" @update-permission="updatePermission" />
+            :buttonLoading="buttonLoading" @update:visible="updatePermisionDialog = $event"
+            @update-permission="updatePermission" />
 
         <PermissionDetailPermissionDialog :visible="permissionDetailDialog" :permission="permissionData"
             @update:visible="permissionDetailDialog = $event" />

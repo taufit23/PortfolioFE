@@ -101,7 +101,7 @@
     async function saveNewRole() {
         buttonLoading.value = true;
         try {
-            const response await post('manage-roles/store', newRole.value);
+            const response = await post('manage-roles/store', newRole.value);
             if (response) {
                 rolesLists.value.push(response.data);
                 console.log(response.data);

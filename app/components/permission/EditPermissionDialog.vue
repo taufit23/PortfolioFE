@@ -9,7 +9,9 @@
 
     const props = defineProps({
         visible: Boolean,
-        permission: Object, //  Data permission yang dikirim dari parent
+        permission: Object,
+        buttonLoading: Boolean,
+
     });
 
     // Emit untuk komunikasi dengan parent
@@ -73,7 +75,8 @@
 
         <template #footer>
             <Button label="Cancel" icon="pi pi-times" text @click="closeDialog" />
-            <Button label="Save" icon="pi pi-check" @click="updatePermission" />
+            <Button label="Save" icon="pi pi-check" :loading="props.buttonLoading" :disabled="props.buttonLoading"
+                @click="updatePermission" />
         </template>
     </Dialog>
 </template>

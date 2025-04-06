@@ -10,6 +10,13 @@
     });
 
     // NOTE: Define Variabel
+    const {
+        get,
+        post,
+        put,
+        patch,
+        del
+    } = useApi();
     const selectedPermision = ref();
     const deleteConfirmDialog = ref();
     const selectedPermissionToDelete = ref({});
@@ -74,51 +81,60 @@
 
     // get data permisions
     async function fetchpermissionLists() {
+        isLoading.value = true;
+
+        const {
+            post
+        } = useApi(); // Ambil dari composable
+
         try {
-            const data = await $fetch(`${baseURL}manage-permissions`, {
-                method: "POST",
-                headers: fecthHeader,
-            });
+            const response = await post('manage-permissions');
 
             // Set data jika berhasil
-            permissionLists.value = data?.data || [];
-            $showToast("success", "Success", data.statusMessage);
+            permissionLists.value = response?.data || [];
+            const {
+                $showToast
+            } = useNuxtApp();
+            $showToast("success", "Success", response.statusMessage);
         } catch (err) {
-            const errorMessage = err?.response?._data?.message;
-            $showToast("error", "Opps!...", errorMessage);
+            // Error sudah di-handle dari dalam useApi
         } finally {
             isLoading.value = false;
         }
     }
 
 
+
     async function saveNewPermission(permissionData) {
         buttonLoading.value = true;
+
+
         try {
-            const response = await $fetch(`${baseURL}manage-permissions/store`, {
-                method: "POST",
-                headers: fecthHeader,
-                body: permissionData, // Gunakan data dari child component
-            });
+            const response = await post('manage-permissions/store', permissionData);
 
             if (response) {
                 permissionLists.value.push(response.data);
-
                 craetePermisionDialog.value = false;
+                const {
+                    $showToast
+                } = useNuxtApp();
                 $showToast("success", "Success", response.data?.statusMessage);
             }
         } catch (err) {
+            // Error dari useApi udah otomatis ditangani di catch
             const errorMessage = err.data ?
                 err.data.message ||
-                Object.values(err.data.errors || {})
-                .flat()
-                .join("\n") :
-                "-";
+                Object.values(err.data.errors || {}).flat().join('\n') :
+                '-';
+            const {
+                $showToast
+            } = useNuxtApp();
             $showToast("error", "Opps!...", errorMessage);
         } finally {
             buttonLoading.value = false;
         }
     }
+
 
 
     // Fungsi untuk membuka modal edit dan mengisi data
@@ -132,13 +148,8 @@
     // Perbaiki fungsi updatePermission agar menggunakan PUT
     async function updatePermission(permissionData) {
         try {
-            const response = await $fetch(
-                `${baseURL}manage-permissions/update`, {
-                    method: "PUT",
-                    headers: fecthHeader,
-                    body: permissionData,
-                });
-
+            const response = await put('manage-permissions/update', permissionData);
+            // Jika berhasil, update data permissionLists
             if (response) {
                 const index = permissionLists.value.findIndex(p => p.id === response?.data?.id);
                 if (index !== -1) {

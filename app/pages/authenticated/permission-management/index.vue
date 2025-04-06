@@ -16,6 +16,9 @@
     const {
         $showToast
     } = useNuxtApp();
+    const {
+        truncate
+    } = useStringUtils()
 
     const config = useRuntimeConfig();
     const baseURL = config.public.API_BASE_URL;
@@ -88,9 +91,6 @@
         }
     }
 
-    function truncateText(text, length) {
-        return text.length > length ? text.substring(0, length) + "..." : text;
-    }
 
     async function saveNewPermission(permissionData) {
         buttonLoading.value = true;
@@ -103,12 +103,11 @@
 
             if (response) {
                 permissionLists.value.push(response.data);
-                $showToast("success", "Success", response.data?.statusMessage);
 
                 craetePermisionDialog.value = false;
+                $showToast("success", "Success", response.data?.statusMessage);
             }
         } catch (err) {
-            console.log(err);
             const errorMessage = err.data ?
                 err.data.message ||
                 Object.values(err.data.errors || {})
@@ -147,10 +146,9 @@
                 }
 
                 $showToast("success", "Success", response?.statusMessage);
-                updatePermisionDialog.value = false; // ✅ Tutup modal setelah update sukses
+                updatePermisionDialog.value = false; //  Tutup modal setelah update sukses
             }
         } catch (err) {
-            console.log(err);
             const errorMessage = err.data ?
                 err.data.message || Object.values(err.data.errors || {}).flat().join("\n") :
                 "-";
@@ -273,7 +271,7 @@
                     <Column field="permision_name" header="Permission Name" sortable style="min-width: 12rem" />
                     <Column field="permision_desc" header="Permission Desc" sortable style="min-width: 12rem">
                         <template #body="slotProps">
-                            {{ truncateText(slotProps . data . permision_desc, 50) }}
+                            {{ truncate(slotProps . data . permision_desc, 50) }}
                         </template>
                     </Column>
                     <Column field="is_menu" header="Is Menu" sortable style="min-width: 5rem" />

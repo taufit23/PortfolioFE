@@ -9,7 +9,7 @@
 
     const props = defineProps({
         visible: Boolean,
-        permission: Object, // ✅ Data permission yang dikirim dari parent
+        permission: Object, //  Data permission yang dikirim dari parent
     });
 
     // Emit untuk komunikasi dengan parent
@@ -22,7 +22,7 @@
         is_menu: '',
     });
 
-    // ✅ Update `dataPermission` setiap kali `props.permission` berubah
+    //  Update `dataPermission` setiap kali `props.permission` berubah
     watch(() => props.permission, (newVal) => {
         if (newVal) {
             dataPermission.value = {
@@ -39,7 +39,7 @@
 
 
     function updatePermission() {
-        emit('update-permission', dataPermission.value); // ✅ Kirim data yang sudah diubah
+        emit('update-permission', dataPermission.value); //  Kirim data yang sudah diubah
     }
 
     function closeDialog() {

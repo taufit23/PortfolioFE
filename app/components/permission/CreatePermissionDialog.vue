@@ -8,7 +8,7 @@
 
     const props = defineProps({
         visible: Boolean,
-        buttonLoading: Boolean, // ✅ Tambahan
+        buttonLoading: Boolean, //  Tambahan
 
     });
 

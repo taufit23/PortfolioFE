@@ -10,6 +10,13 @@
     });
 
     // NOTE: Define Variabel
+    const {
+        get,
+        post,
+        put,
+        patch,
+        del
+    } = useApi();
     const selectedPermision = ref();
     const deleteConfirmDialog = ref();
     const selectedPermissionToDelete = ref({});
@@ -48,11 +55,6 @@
     const craetePermisionDialog = ref(false);
     const updatePermisionDialog = ref(false);
     const permissionData = ref({});
-    const fecthHeader = {
-        Authorization: `Bearer ${token.value.trim()}`,
-        Accept: "application/json",
-        "Content-Type": "application/json",
-    };
     const permissionDetailDialog = ref(false);
     const permissionDeleteDialog = ref(false);
     // NOTE: Define Functions
@@ -74,51 +76,56 @@
 
     // get data permisions
     async function fetchpermissionLists() {
+        isLoading.value = true;
+
         try {
-            const data = await $fetch(`${baseURL}manage-permissions`, {
-                method: "POST",
-                headers: fecthHeader,
-            });
+            const response = await post('manage-permissions');
 
             // Set data jika berhasil
-            permissionLists.value = data?.data || [];
-            $showToast("success", "Success", data.statusMessage);
+            permissionLists.value = response?.data || [];
+            const {
+                $showToast
+            } = useNuxtApp();
+            $showToast("success", "Success", response.statusMessage);
         } catch (err) {
-            const errorMessage = err?.response?._data?.message;
-            $showToast("error", "Opps!...", errorMessage);
+            // Error sudah di-handle dari dalam useApi
         } finally {
             isLoading.value = false;
         }
     }
 
 
+
     async function saveNewPermission(permissionData) {
         buttonLoading.value = true;
+
+
         try {
-            const response = await $fetch(`${baseURL}manage-permissions/store`, {
-                method: "POST",
-                headers: fecthHeader,
-                body: permissionData, // Gunakan data dari child component
-            });
+            const response = await post('manage-permissions/store', permissionData);
 
             if (response) {
                 permissionLists.value.push(response.data);
-
                 craetePermisionDialog.value = false;
+                const {
+                    $showToast
+                } = useNuxtApp();
                 $showToast("success", "Success", response.data?.statusMessage);
             }
         } catch (err) {
+            // Error dari useApi udah otomatis ditangani di catch
             const errorMessage = err.data ?
                 err.data.message ||
-                Object.values(err.data.errors || {})
-                .flat()
-                .join("\n") :
-                "-";
+                Object.values(err.data.errors || {}).flat().join('\n') :
+                '-';
+            const {
+                $showToast
+            } = useNuxtApp();
             $showToast("error", "Opps!...", errorMessage);
         } finally {
             buttonLoading.value = false;
         }
     }
+
 
 
     // Fungsi untuk membuka modal edit dan mengisi data
@@ -131,14 +138,11 @@
 
     // Perbaiki fungsi updatePermission agar menggunakan PUT
     async function updatePermission(permissionData) {
-        try {
-            const response = await $fetch(
-                `${baseURL}manage-permissions/update`, {
-                    method: "PUT",
-                    headers: fecthHeader,
-                    body: permissionData,
-                });
+        buttonLoading.value = true;
 
+        try {
+            const response = await put('manage-permissions/update', permissionData);
+            // Jika berhasil, update data permissionLists
             if (response) {
                 const index = permissionLists.value.findIndex(p => p.id === response?.data?.id);
                 if (index !== -1) {
@@ -152,20 +156,17 @@
             const errorMessage = err.data ?
                 err.data.message || Object.values(err.data.errors || {}).flat().join("\n") :
                 "-";
-
             $showToast("error", "Opps!...", errorMessage);
+        } finally {
+            buttonLoading.value = false;
         }
     }
 
     async function showDetailPermision(permission) {
         setDetailLoading(permission.id, true)
         try {
-            const data = await $fetch(`${baseURL}manage-permissions/show`, {
-                method: "POST",
-                headers: fecthHeader,
-                body: JSON.stringify({
-                    permision_id: permission.id
-                }),
+            const data = await post('manage-permissions/show', {
+                permision_id: permission.id
             });
 
             if (data?.data) {
@@ -185,13 +186,9 @@
         setDeleteLoading(permission.id, true)
 
         try {
-            const data = await $fetch(`${baseURL}manage-permissions/show`, {
-                method: "POST",
-                headers: fecthHeader,
-                body: JSON.stringify({
-                    permision_id: permission.id,
-                    is_deletable: true
-                }),
+            const data = await post('manage-permissions/show', {
+                permision_id: permission.id,
+                is_deletable: true
             });
 
             if (data?.data) {
@@ -212,13 +209,10 @@
     async function deletePermission(permission) {
         buttonLoading.value = true;
         try {
-            const data = await $fetch(`${baseURL}manage-permissions/delete`, {
-                method: "DELETE",
-                headers: fecthHeader,
-                body: {
-                    permision_id: permission.id
-                },
+            const data = await del('manage-permissions/delete', {
+                permision_id: permission.id
             });
+
 
             permissionLists.value = permissionLists.value.filter(p => p.id !== permission.id);
             $showToast("success", "Deleted", data.statusMessage);
@@ -301,7 +295,8 @@
             @save-permission="saveNewPermission" />
 
         <PermissionEditPermissionDialog :visible="updatePermisionDialog" :permission="permissionData"
-            @update:visible="updatePermisionDialog = $event" @update-permission="updatePermission" />
+            :buttonLoading="buttonLoading" @update:visible="updatePermisionDialog = $event"
+            @update-permission="updatePermission" />
 
         <PermissionDetailPermissionDialog :visible="permissionDetailDialog" :permission="permissionData"
             @update:visible="permissionDetailDialog = $event" />

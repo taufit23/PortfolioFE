@@ -10,6 +10,13 @@
     });
 
     // NOTE: Define Variabel
+    const {
+        get,
+        post,
+        put,
+        patch,
+        del
+    } = useApi();
     const selectedRoles = ref();
     const {
         $showToast
@@ -61,13 +68,7 @@
 
     async function fetchrolesLists() {
         try {
-            const data = await $fetch(`${baseURL}manage-roles`, {
-                method: "POST",
-                headers: {
-                    Authorization: `Bearer ${token.value.trim()}`,
-                    Accept: "application/json",
-                },
-            });
+            const data = await post('manage-roles');
 
             // Simpan hasil ke rolesLists
             rolesLists.value = data?.data || [];
@@ -83,14 +84,7 @@
     // get data permisions
     async function fetchpermisionLists() {
         try {
-            const data = await $fetch(`${baseURL}manage-permissions`, {
-                method: "POST",
-                headers: {
-                    Authorization: `Bearer ${token.value.trim()}`,
-                    Accept: "application/json",
-                },
-            });
-
+            const data = await post('manage-permissions');
             // Set data jika berhasil
             permisionLists.value = data?.data || [];
             $showToast("success", "Success", data.statusMessage);
@@ -107,15 +101,7 @@
     async function saveNewRole() {
         buttonLoading.value = true;
         try {
-            const response = await $fetch(`${baseURL}manage-roles/store`, {
-                method: "POST",
-                headers: {
-                    Authorization: `Bearer ${token.value.trim()}`,
-                    "Content-Type": "application/json",
-                },
-                body: newRole.value,
-            });
-
+            const response await post('manage-roles/store', newRole.value);
             if (response) {
                 rolesLists.value.push(response.data);
                 console.log(response.data);
@@ -141,17 +127,9 @@
     async function showDetailRole(role) {
         setDetailLoading(role.id, true)
         try {
-            const data = await $fetch(`${baseURL}manage-roles/show`, {
-                method: "POST",
-                headers: {
-                    Authorization: `Bearer ${token.value.trim()}`,
-                    Accept: "application/json",
-                },
-                body: {
-                    role_id: role.id
-                },
-            })
-
+            const data = await post('manage-roles/show', {
+                role_id: role.id
+            });
             // Tampilkan data ke dialog detail (belum ditampilkan di UI ya, tinggal lo tambahin kalau butuh)
             console.log("Detail:", data.data)
             $showToast("success", "Success", data.statusMessage)
@@ -166,21 +144,12 @@
     async function confirmDeleteRole(role) {
         setDeleteLoading(role.id, true)
         try {
-            const data = await $fetch(`${baseURL}manage-roles/show`, {
-                method: "POST",
-                headers: {
-                    Authorization: `Bearer ${token.value.trim()}`,
-                    Accept: "application/json",
-                },
-                body: {
-                    role_id: role.id,
-                    is_deletable: true
-                },
-            })
-
+            const data = await post('manage-roles/show', {
+                role_id: role.id,
+                is_deletable: true
+            });
             // Contoh konfirmasi log
             console.log("Can be deleted:", data.data)
-
             $showToast("success", "Success", data.statusMessage)
             // Tinggal munculin dialog konfirmasi delete kalau mau (lo bisa trigger modal dari sini)
         } catch (err) {

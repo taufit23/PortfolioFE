@@ -55,11 +55,6 @@
     const craetePermisionDialog = ref(false);
     const updatePermisionDialog = ref(false);
     const permissionData = ref({});
-    const fecthHeader = {
-        Authorization: `Bearer ${token.value.trim()}`,
-        Accept: "application/json",
-        "Content-Type": "application/json",
-    };
     const permissionDetailDialog = ref(false);
     const permissionDeleteDialog = ref(false);
     // NOTE: Define Functions
@@ -82,10 +77,6 @@
     // get data permisions
     async function fetchpermissionLists() {
         isLoading.value = true;
-
-        const {
-            post
-        } = useApi(); // Ambil dari composable
 
         try {
             const response = await post('manage-permissions');
@@ -171,12 +162,8 @@
     async function showDetailPermision(permission) {
         setDetailLoading(permission.id, true)
         try {
-            const data = await $fetch(`${baseURL}manage-permissions/show`, {
-                method: "POST",
-                headers: fecthHeader,
-                body: JSON.stringify({
-                    permision_id: permission.id
-                }),
+            const data = await post('manage-permissions/show', {
+                permision_id: permission.id
             });
 
             if (data?.data) {
@@ -196,13 +183,9 @@
         setDeleteLoading(permission.id, true)
 
         try {
-            const data = await $fetch(`${baseURL}manage-permissions/show`, {
-                method: "POST",
-                headers: fecthHeader,
-                body: JSON.stringify({
-                    permision_id: permission.id,
-                    is_deletable: true
-                }),
+            const data = await post('manage-permissions/show', {
+                permision_id: permission.id,
+                is_deletable: true
             });
 
             if (data?.data) {
@@ -223,13 +206,10 @@
     async function deletePermission(permission) {
         buttonLoading.value = true;
         try {
-            const data = await $fetch(`${baseURL}manage-permissions/delete`, {
-                method: "DELETE",
-                headers: fecthHeader,
-                body: {
-                    permision_id: permission.id
-                },
+            const data = await del('manage-permissions/delete', {
+                permision_id: permission.id
             });
+
 
             permissionLists.value = permissionLists.value.filter(p => p.id !== permission.id);
             $showToast("success", "Deleted", data.statusMessage);
